@@ -30,6 +30,11 @@ app.get('/', (req, res) => {
     res.send({ message: 'Server is running here!!' })
 })
 
+app.get('/events', async (req, res) => {
+    const result = await eventCollection.find().toArray();
+    res.send(result);
+})
+
 app.post('/create-event', async (req, res) => {
     const data = req.body;
     const result = await eventCollection.insertOne(data);

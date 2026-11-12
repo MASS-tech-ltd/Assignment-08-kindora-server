@@ -24,6 +24,7 @@ export async function connectToMongoDB() {
 const mongoClient = await connectToMongoDB();
 const db = mongoClient.db("kindora");
 const eventCollection = db.collection('events');
+const joinEventCollection = db.collection('joinEvents');
 
 
 app.get('/', (req, res) => {
@@ -40,10 +41,28 @@ app.get('/events/:id', async (req, res) => {
     const result = await eventCollection.findOne({_id : new ObjectId(id)})
     res.send(result);
 })
+app.get('/my-created-events/:email', async (req, res) => {
+    const {email} = req.params;
+    const result = await eventCollection.find({email : email}).toArray()
+    res.send(result);
+})
+
+app.get('/my-joined-events/:email', async (req, res) => {
+    const {email} = req.params;
+    const result = await joinEventCollection.find({email : email}).toArray()
+    res.send(result);
+})
 
 app.post('/create-event', async (req, res) => {
     const data = req.body;
     const result = await eventCollection.insertOne(data);
+    console.log(result);
+    res.send(result);
+})
+
+app.post('/join-event', async (req, res) => {
+    const data = req.body;
+    const result = await joinEventCollection.insertOne(data);
     console.log(result);
     res.send(result);
 })

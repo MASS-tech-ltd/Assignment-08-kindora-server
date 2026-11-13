@@ -37,20 +37,31 @@ app.get('/events', async (req, res) => {
 })
 
 app.get('/events/:id', async (req, res) => {
-    const {id} = req.params;
-    const result = await eventCollection.findOne({_id : new ObjectId(id)})
+    const { id } = req.params;
+    const result = await eventCollection.findOne({ _id: new ObjectId(id) })
     res.send(result);
 })
+
 app.get('/my-created-events/:email', async (req, res) => {
-    const {email} = req.params;
-    const result = await eventCollection.find({email : email}).toArray()
+    const { email } = req.params;
+    const result = await eventCollection.find({ email: email }).toArray()
     res.send(result);
 })
 
 app.get('/my-joined-events/:email', async (req, res) => {
-    const {email} = req.params;
-    const result = await joinEventCollection.find({email : email}).toArray()
+    const { email } = req.params;
+    const result = await joinEventCollection.find({ email: email }).toArray()
     res.send(result);
+})
+
+app.patch('/events/:id', async (req, res) => {
+    const { id } = req.params;
+    const updatedData = req.body;
+    const result = await eventCollection.updateOne(
+        { _id: new ObjectId(id) },
+        { $set: updatedData }
+    )
+    res.json(result);
 })
 
 app.post('/create-event', async (req, res) => {

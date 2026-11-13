@@ -64,6 +64,13 @@ app.patch('/events/:id', async (req, res) => {
     res.json(result);
 })
 
+app.delete('/events/:id', async (req, res) => {
+    const { id } = req.params;
+    const result = await eventCollection.deleteOne({ _id: new ObjectId(id) })
+    res.send(result);
+})
+
+
 app.post('/create-event', async (req, res) => {
     const data = req.body;
     const result = await eventCollection.insertOne(data);

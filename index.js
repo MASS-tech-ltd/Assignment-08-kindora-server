@@ -2,6 +2,7 @@ import express from "express";
 import cors from "cors";
 import 'dotenv/config';
 import { MongoClient, ObjectId } from 'mongodb';
+import { createRemoteJWKSet, jwtVerify } from "jose";
 
 const app = express();
 const port = process.env.PORT || 5000;
@@ -26,6 +27,28 @@ const db = mongoClient.db("kindora");
 const eventCollection = db.collection('events');
 const joinEventCollection = db.collection('joinEvents');
 
+const varifyToken = async (req, res, next) => {
+    const authHeader = req.headers.authorization;
+    if (!authHeader) {
+        return res.status(401).send({ message: "Unauthorized!" });
+    }
+
+    const token = authHeader.split(" ")[1]
+    if (!token) {
+        return res.status(401).send({ message: "Unauthorized!" });
+    }
+    const JWKS = createRemoteJWKSet(
+        new URL('http://localhost:3000/api/auth/jwks')
+    )
+
+     try {
+        const { payload } = await jwtVerify(token, JWKS)
+        next();
+     } catch (error) {
+        return res.status(500).send({ message: "Server error!" });
+     }
+    
+}
 
 app.get('/', (req, res) => {
     res.send({ message: 'Server is running here!!' })
@@ -47,11 +70,13 @@ app.get('/events/:id', async (req, res) => {
     res.send(result);
 })
 
-app.get('/my-created-events/:email', async (req, res) => {
-    const { email } = req.params;
-    const result = await eventCollection.find({ email: email }).toArray()
-    res.send(result);
-})
+app.get('/my-created-events/:email',
+    varifyToken,
+    async (req, res) => {
+        const { email } = req.params;
+        const result = await eventCollection.find({ email: email }).toArray()
+        res.send(result);
+    })
 
 app.get('/my-joined-events/:email', async (req, res) => {
     const { email } = req.params;

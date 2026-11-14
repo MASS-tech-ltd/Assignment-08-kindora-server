@@ -36,6 +36,11 @@ app.get('/events', async (req, res) => {
     res.send(result);
 })
 
+app.get('/home-events', async (req, res) => {
+    const result = await eventCollection.find().sort({ _id: -1 }).limit(6).toArray();
+    res.send(result);
+})
+
 app.get('/events/:id', async (req, res) => {
     const { id } = req.params;
     const result = await eventCollection.findOne({ _id: new ObjectId(id) })

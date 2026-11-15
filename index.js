@@ -90,23 +90,48 @@ app.get('/', (req, res) => {
 });
 
 
-// Get All Events
+
+
+// Get All Upcoming Events
 app.get('/events', async (req, res) => {
-    const result = await eventCollection.find().toArray();
+    const today = new Intl.DateTimeFormat("en-CA", {
+        timeZone: "Asia/Dhaka",
+        year: "numeric",
+        month: "2-digit",
+        day: "2-digit"
+    }).format(new Date());
+
+    const result = await eventCollection
+        .find({
+            eventDate: { $gt: today }
+        })
+        .sort({ eventDate: 1 })
+        .toArray();
+
     res.send(result);
 });
 
 
-// Get Home Events
+// Get Home Upcoming Events
 app.get('/home-events', async (req, res) => {
+    const today = new Intl.DateTimeFormat("en-CA", {
+        timeZone: "Asia/Dhaka",
+        year: "numeric",
+        month: "2-digit",
+        day: "2-digit"
+    }).format(new Date());
+
     const result = await eventCollection
-        .find()
+        .find({
+            eventDate: { $gt: today }
+        })
         .sort({ _id: -1 })
         .limit(6)
         .toArray();
 
     res.send(result);
 });
+
 
 
 // Get Single Event

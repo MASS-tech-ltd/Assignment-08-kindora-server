@@ -33,7 +33,7 @@ const joinEventCollection = db.collection('joinEvents');
 
 // JWT Configuration
 const JWKS = createRemoteJWKSet(
-    new URL("http://localhost:3000/api/auth/jwks")
+    new URL(`${process.env.CLIENT_URL}/api/auth/jwks`)
 );
 
 
@@ -387,3 +387,5 @@ app.post('/join-event', varifyToken, async (req, res) => {
 app.listen(port, () => {
     console.log(`Server is running successfully at ${port}`);
 });
+
+export default app;
